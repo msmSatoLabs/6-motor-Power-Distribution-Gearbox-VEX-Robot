@@ -1,463 +1,491 @@
 # 6-Motor Power Distribution Gearbox System
 
-> One of the most ambitious and mechanically complex robots I have designed during my VEX Robotics career. This robot uses a combination of pneumatic clutches, a two-speed transmission, gear trains, and chain drives to dynamically redistribute motor power between three separate subsystems while simultaneously changing the drivetrain's gear ratio.
+> One of the most ambitious and mechanically complex robots I have designed during my VEX Robotics career. This robot uses a combination of **pneumatic clutches, a two-speed transmission, gear trains, and chain drives** to dynamically redistribute motor power between three separate subsystems while simultaneously changing the drivetrain's gear ratio.
 
 ---
 
-## Robot Design and Development
-
-This robot was designed for the **VEX Robotics Competition game Push Back**. The main goal of the design was to create a robot that could quickly adapt between driving, intake, scoring, and defensive roles without requiring a completely separate mechanism for each task.
-
-The most important part of the design is the **power distribution system**. Instead of permanently assigning every motor to one subsystem, pneumatic clutches allow motors to be transferred between the drivetrain, intake, and flywheel.
-
-This allowed me to build a robot that could change its mechanical configuration during a match depending on what was needed.
-
----
+# Robot Design and Development
 
 ## 1. Design Evolution and Game Strategy
 
-One of the biggest strategic problems I noticed during the season was how the game was evolving.
+This robot was designed for the **VEX Robotics Competition game Push Back**.
 
-There are **two Long Goals** on the field. In the center of each Long Goal is a **Goal Control Zone**. The zone can hold three balls, and controlling it provides additional points.
+In Push Back, robots collect balls and score them in goals. There are two **Long Goals** on the field. At the center of each Long Goal is a **Goal Control Zone**, which can hold up to three balls. Controlling this area provides additional points, making the position of the balls in the center of the goal strategically important.
 
-My original robot, V1, relied heavily on **winging** — using a mechanical wing to move balls out of the Long Goal. This worked well early in the season, when there were usually several balls sitting in the goal.
+After completing our first robot of the season, we determined that its overall architecture had significant potential. Our original plan was to recreate the same fundamental design while improving its CAD, manufacturability, reliability, and mechanical execution.
 
-However, as the meta developed, fewer balls were being left in the control zone. This made winging much less effective.
+However, as we developed our strategy for Push Back, we identified a weakness in our original approach.
 
-If I was behind in points and the opponent controlled the Goal Control Zone, V1 had to first score enough balls to reach the middle of the goal and then use the wing to remove the opponent's balls.
+Our first robot relied heavily on **winging**, which involves using a mechanism to move balls out of the Long Goal and into another area of the field. This strategy was effective when there were many balls available to manipulate. However, as teams became better at clearing balls from the Goal Control Zone, fewer balls remained available for this strategy.
 
-I wanted V2 to solve this problem differently.
+This became especially problematic when we were behind in score and our opponent controlled the balls in the Goal Control Zone. With our original robot, regaining control required several steps:
 
-### Using the Flywheel to Disrupt the Control Zone
+1. Collect enough balls to reach the center of the Long Goal.
+2. Position the robot to interact with those balls.
+3. Wing the balls out of the opponent's control.
+4. Reposition the balls so that we could establish control ourselves.
 
-Instead of physically reaching the balls with a wing, I designed the robot to shoot a ball directly into the center of the Long Goal.
+We wanted a way to challenge the opponent's control much more quickly.
 
-The launched ball has enough momentum to disturb the group of balls sitting in the Goal Control Zone.
+### Flywheel Strategy
 
-The idea is similar to a **Newton's cradle**. A ball entering one side of a tightly packed group can transfer momentum through the group and cause the ball on the opposite side to move.
+Our solution was to add a **flywheel capable of launching a ball directly into the Goal Control Zone**.
 
-In the best-case scenario, my launched ball enters the control zone and causes one of the opponent's balls at the other end to get knocked out of the zone.
+The idea was to use the momentum of our launched ball to disrupt the three balls already occupying the control zone. If our ball enters one side of the group with enough momentum, that momentum can be transferred through the group of balls. Similar to the principle demonstrated by a Newton's cradle, the ball on the opposite side of the group can be forced out of the Goal Control Zone.
 
-This gives the robot a way to disrupt control **without first having to physically reach the center of the goal**.
+This meant that instead of physically collecting and repositioning multiple balls ourselves, we could potentially remove an opponent's ball from the control zone with a single launched ball.
+
+Our strategy therefore changed from:
+
+> **Collect → Position → Wing → Regain Control**
+
+to:
+
+> **Launch → Disrupt Opponent's Control → Establish Our Own Control**
+
+This strategic change had a major impact on the mechanical design of the robot.
 
 ---
 
 ## 2. Early V2 Design Concepts
 
-These are some of the early sketches and concepts for the V2 robot.
+Our first step was to explore how the new strategy could be incorporated into the robot.
 
-<img src="https://github.com/user-attachments/assets/0ce3e39d-30e9-4f99-b411-dc54e31a6736" width="66%">
+These early sketches helped us move away from simply rebuilding our previous robot and instead explore a new architecture centered around the flywheel, motor-sharing system, and revised intake.
 
-<img src="https://github.com/user-attachments/assets/dad5ecb6-376f-41d8-9cac-937d451bd5dd" width="66%">
+![Early V2 robot sketch 1](https://github.com/user-attachments/assets/0ce3e39d-30e9-4f99-b411-dc54e31a6736)
 
-<img src="https://github.com/user-attachments/assets/ff84876d-6cea-4f78-b8c7-db2a77808d86" width="66%">
+![Early V2 robot sketch 2](https://github.com/user-attachments/assets/dad5ecb6-376f-41d8-9cac-937d451bd5dd)
 
-These sketches helped establish the overall layout of the robot and how the drivetrain, intake, wing, and scoring mechanisms would fit together.
+![Early V2 robot sketch 3](https://github.com/user-attachments/assets/ff84876d-6cea-4f78-b8c7-db2a77808d86)
 
-A major constraint was that the robot needed to be able to **drive underneath the Long Goal**. This influenced the placement and motion of the wing as well as the overall height of the robot.
+*Early sketches exploring the architecture of our V2 robot.*
 
 ---
 
-## 3. Motor Allocation and Power Sharing
+# 3. Motor Allocation and Power Sharing
 
-The robot uses **eight motors total**.
+Adding a high-speed flywheel created a new engineering constraint: **power**.
 
-The key idea was to avoid permanently dedicating all eight motors to the drivetrain. Instead, pneumatic clutches allow motor power to be redistributed depending on the robot's current task.
+Our previous intake system already had significant mechanical friction. Adding a flywheel capable of launching a ball into the Goal Control Zone required additional motor power.
 
-The robot can operate in several different configurations:
+We therefore needed to dedicate four motors to the intake and flywheel system.
 
-| Configuration | Drivetrain Motors | Intake / Flywheel Motors | Purpose |
+This created a major problem.
+
+If four motors were permanently dedicated to the intake and flywheel, only four motors would remain for the drivetrain. Four drivetrain motors did not provide enough pushing force for our robot. This was particularly dangerous in Push Back because robots frequently interact directly with each other while fighting for control of the field.
+
+We therefore decided not to permanently assign every motor to a single subsystem.
+
+Instead, we designed a **mechanical motor-sharing system**.
+
+The motors themselves remain fixed to the robot. They do not physically move between subsystems. Instead, pneumatic pistons move gears that change the mechanical path through which the motors transmit their power.
+
+This allows the same motors to be used by different subsystems depending on what the robot is doing.
+
+### Motor Allocation
+
+The robot can dynamically change between several configurations:
+
+| Configuration | Drivetrain | Intake / Flywheel | Purpose |
 |---|---:|---:|---|
-| High-Speed Drive | 8 | 0 | Maximum driving speed |
-| General Driving | 6 | 2 | Balanced driving and intake |
-| Flywheel / Scoring | 4 | 4 | Maximum scoring power |
-| Defensive / High-Torque | 6 | 2 | More drivetrain torque |
+| **High-Speed Drive** | 8 motors | 0 motors | Maximum drivetrain speed and power |
+| **General Driving** | 6 motors | 2 motors | Fast movement while retaining intake capability |
+| **Flywheel / Scoring** | 4 motors | 4 motors | Maximum intake and flywheel power |
+| **High-Torque Drive** | 6 motors | 2 motors | Maximum pushing force with reduced drivetrain speed |
 
-The motors themselves do **not** physically move.
-
-Instead, pneumatic pistons move gears into or out of mesh. This redirects the power coming from the motors to different mechanical systems.
-
-This is what makes the system function like a mechanical power distribution gearbox.
+Rather than treating the eight motors as permanently assigned resources, we designed the robot so that motor power could be **redistributed mechanically during a match**.
 
 ---
 
-## 4. Drivetrain Speed and Torque Problem
+# 4. Drivetrain Speed and the Torque Problem
 
-The drivetrain uses **2.75-inch wheels**.
+We wanted our robot to be faster than most competing robots, so we initially designed the drivetrain around **2.75-inch wheels and a 600 RPM output speed**.
 
-One of the biggest engineering challenges was balancing speed and pushing power.
+With eight motors powering the drivetrain, the 600 RPM configuration provided the speed we wanted while still providing sufficient torque.
 
-With eight motors driving the robot, a **600 RPM drivetrain ratio** provided the speed I wanted.
+However, when motors were transferred from the drivetrain to the intake and flywheel, the situation changed.
 
-However, running only four motors through the same ratio did not provide enough torque for defensive situations.
+With only four motors powering the drivetrain, the 600 RPM configuration did not provide enough torque.
 
-Four motors simply did not have enough pushing power to reliably defend against another robot.
+This created a serious problem. A robot with four motors on the drivetrain could move quickly, but it could also be pushed around too easily by an opposing robot.
 
-This created a problem:
+This was especially dangerous while scoring. If an opponent could push us away from the goal while we were trying to score, the additional flywheel power would not matter because we would not be able to maintain our position.
 
-> How could I get the speed of the 600 RPM drivetrain when I had enough motors available, but still have enough torque when only four drivetrain motors were being used?
+We therefore needed to solve two problems simultaneously:
 
-The solution was a **two-speed transmission**.
+- **High speed** when enough motors were powering the drivetrain.
+- **High torque** when motors were transferred to the intake and flywheel.
 
 ---
 
 ## 5. Two-Speed Transmission
 
-The drivetrain has two gear ratios:
+Our solution was to integrate a **two-speed transmission** into the drivetrain.
 
-- **600 RPM:** high-speed configuration
-- **200 RPM:** high-torque configuration
+The transmission changes the gear reduction between the motors and the wheels, allowing the drivetrain to operate at either:
 
-These values refer to the **speed after the drivetrain gearing**, rather than the nominal speed of the motors themselves.
+- **600 RPM:** High-speed configuration
+- **200 RPM:** High-torque configuration
 
-The high-speed ratio is useful when the robot has eight motors available for driving.
+The 200 RPM configuration is significantly slower, but the greater gear reduction increases the torque available at the wheels.
 
-The lower-speed ratio provides much more torque and is used when fewer motors are powering the drivetrain.
+This allowed us to compensate for the reduced number of drivetrain motors when operating the flywheel.
 
-<img src="https://github.com/user-attachments/assets/3ba639a0-098d-420d-9bfb-641e5098cbd4" width="66%">
+Instead of accepting that four drivetrain motors would automatically make the robot easy to push, we used the transmission to trade speed for mechanical advantage:
 
-The chassis contains two separate gear trains on each side. One provides the faster driving ratio, while the other provides the slower, more powerful ratio.
+> **4 motors + high gear reduction = significantly more pushing torque**
+
+This allowed the robot to maintain useful pushing capability even while dedicating half of its motors to scoring.
+
+![V2 chassis with two gear trains](https://github.com/user-attachments/assets/3ba639a0-098d-420d-9bfb-641e5098cbd4)
+
+*The chassis contains two drivetrain gear paths. One provides the high-speed ratio used for fast movement, while the other provides a lower-speed, higher-torque ratio for situations where pushing power is more important.*
 
 ---
 
-## 6. Mechanical Motor-Sharing System
+# 6. Mechanical Motor-Sharing System
 
-The power distribution system uses **two pneumatic clutches**.
+The motor-sharing system uses two pneumatic pistons to redirect motor power through different gear paths.
 
-A pneumatic clutch is a mechanism that uses a piston to physically move gears into or out of engagement. This allows a motor to transfer its power between different mechanical systems.
+The key design principle is that **the motors themselves remain stationary**.
 
-<img src="https://github.com/user-attachments/assets/f8ce13d7-89ce-4452-8ba4-38801e178507" width="66%">
+Instead of moving the motors, we move the gears that determine where their power goes.
 
-### Piston A — Drivetrain / Flywheel
+This allowed us to build a relatively compact system while still giving the robot multiple mechanical configurations.
 
-The first piston controls a pair of motors.
+## Piston A: Drivetrain and Flywheel Power Transfer
 
-When extended, it pushes the gears into the drivetrain.
+Piston A controls the power path between two drivetrain motors and the flywheel system.
 
-At the same time, it shifts the transmission into the **600 RPM high-speed ratio**.
+When **Piston A extends**, it moves gears into mesh with the drivetrain gears. This connects the additional two motors to the drivetrain.
 
-When retracted, those motors are removed from the drivetrain and their power is redirected toward the flywheel.
+At the same time, the transmission shifts into the **600 RPM high-speed configuration**.
 
-The transmission simultaneously shifts into the **200 RPM high-torque ratio**.
+When **Piston A retracts**, those two motors are removed from the drivetrain power path and their power is redirected toward the intake/flywheel system.
 
-This means that a single pneumatic action changes **both motor allocation and drivetrain gearing**.
+The transmission simultaneously shifts into the **200 RPM high-torque configuration**.
 
-<img src="https://github.com/user-attachments/assets/84457bd7-cdbb-4e13-b3da-d0b2fe4dae85" width="66%">
+Therefore, one pneumatic movement performs two mechanical functions:
 
-The piston activates both the clutch and the transmission at the same time.
+1. It transfers two motors from the drivetrain to the flywheel system.
+2. It changes the drivetrain from a high-speed ratio to a high-torque ratio.
 
-### Piston B — Drivetrain / Intake
+### Early Four-Bar and Flywheel Development
 
-The second piston controls another pair of motors.
+Before finalizing the drivetrain and intake architecture, we developed the mechanisms that would support the flywheel.
 
-When extended, these motors provide power to the drivetrain.
+![Early four-bar development](https://github.com/user-attachments/assets/951a2255-c919-407d-8664-7df89594b5e9)
 
-When retracted, their power is redirected to the **first and second intake stages**.
+*Early development of the four-bar mechanism that would eventually support the flywheel.*
+
+![Four-bar over-center locking mechanism](https://github.com/user-attachments/assets/90e80fd0-cf7d-49cc-8f6e-e787f0387127)
+
+*The four-bar was controlled by two pneumatic pistons acting through an over-center linkage. Once actuated, the linkage mechanically locked the mechanism in place, meaning the pistons did not need to continuously provide force to keep the mechanism raised.*
+
+---
+
+## Piston B: Intake and Drivetrain Power Transfer
+
+Piston B controls another pair of motors and determines whether their power is sent to the drivetrain or the first and second stages of the intake.
+
+When **Piston B extends**, these motors contribute to the drivetrain.
+
+When **Piston B retracts**, these motors are redirected toward the first and second stages of the intake.
 
 The flywheel is controlled separately from these intake stages.
 
-This allows the robot to distribute its motor power depending on whether it needs to prioritize:
+This gives us another useful combination of motor allocation.
 
-- driving
-- intake
-- flywheel scoring
-- defense
+For example, when **Piston A is retracted and Piston B is extended**, the robot has:
 
----
+- **6 drivetrain motors**
+- **200 RPM drivetrain gearing**
+- Reduced intake functionality
+- High drivetrain torque
 
-## 7. Transmission Mechanism
+This became our preferred **defensive configuration**.
 
-A sliding carriage moves one of the gears into position to change the drivetrain ratio.
+The robot sacrifices speed and some intake functionality in exchange for significantly greater pushing capability. This allows us to protect our own scoring area, resist opposing robots, and contest control of the field.
 
-<img src="https://github.com/user-attachments/assets/e69ff543-e6b7-4d5d-8dd1-4bb06be223cf" width="66%">
+![Clutch system](https://github.com/user-attachments/assets/1ef59d96-4ca5-4c22-a56f-8f1f887b52ca)
 
-The carriage physically changes which gears are engaged.
+*The clutch system used to redirect motor power between different subsystems.*
 
-This was one of the more mechanically difficult parts of the robot because the gears needed to engage reliably while the system was being actuated pneumatically.
+![Top view of the two clutches](https://github.com/user-attachments/assets/f8ce13d7-89ce-4452-8ba4-38801e178507)
 
-The transmission also uses **beveled gears** to route power through the mechanism.
-
-<img src="https://github.com/user-attachments/assets/4df69bf1-1443-488b-91c9-2255c24b680b" width="66%">
+*Top view showing the two clutches used to transfer motor power between the drivetrain, intake, and flywheel systems.*
 
 ---
 
-## 8. Chain Power Transfer
+# 7. Designing the Transmission
 
-Some of the mechanical systems were separated by a significant distance.
+One of the most challenging parts of the system was creating a mechanism that could change the drivetrain's gear ratio at the same time that motor power was being redirected.
 
-Rather than adding another long gear train, I used a **sprocket and chain system** to transfer power between them.
+The transmission used a **sliding gear carriage** to move the appropriate gear into the drivetrain power path.
 
-<img src="https://github.com/user-attachments/assets/f362eb9f-fed3-469a-b981-ec1b48c03f9d" width="66%">
+![Piston and transmission concept](https://github.com/user-attachments/assets/84457bd7-cdbb-4e13-b3da-d0b2fe4dae85)
 
-A chain allowed the power to travel across the robot while keeping the mechanism compact and reducing the number of gears required.
+*Early sketch showing how the pneumatic piston would simultaneously activate the clutch and transmission.*
 
----
+![Sliding transmission carriage](https://github.com/user-attachments/assets/e69ff543-e6b7-4d5d-8dd1-4bb06be223cf)
 
-## 9. Intake and Wing Design
+*The sliding carriage moves a gear into the appropriate position, changing the drivetrain's gear ratio.*
 
-The intake and wing had several important design requirements.
+![Beveled transmission gears](https://github.com/user-attachments/assets/4df69bf1-1443-488b-91c9-2255c24b680b)
 
-The wing needed to:
+*Beveled gears used as part of the transmission system in the chassis.*
 
-- remain relatively compact
-- move vertically
-- fit underneath the Long Goal
-- have a smaller range of motion
-- be easy to position inside the goal
+### Transmitting Power Across the Robot
 
-I chose a **parallel four-bar linkage** for the wing.
+Because the motors and the mechanisms they powered were separated by significant distances, we could not always transfer power directly through a simple gear train.
 
-A parallel four-bar is a linkage made from four connected arms where the moving section maintains approximately the same orientation throughout its motion.
+Instead, we used **sprockets and chain** to transmit rotational power across the robot.
 
-In this robot, that means the wing stays **vertical and perpendicular to the floor** as it moves.
+![Chain power transmission](https://github.com/user-attachments/assets/f362eb9f-fed3-469a-b981-ec1b48c03f9d)
 
-This made it much easier to position the wing inside the Long Goal.
+*Sprocket and chain system used to transmit motor power between mechanisms separated by a significant distance.*
+
+This allowed us to position the motors where they were most convenient for the chassis while still delivering power to mechanisms located farther away.
 
 ---
 
-## 10. Four-Bar Mechanism
+# 8. Chassis Architecture
 
-The early development of the four-bar mechanism can be seen below.
+The motor-sharing system required us to rethink the conventional VEX drivetrain layout.
 
-<img src="https://github.com/user-attachments/assets/951a2255-c919-407d-8664-7df89594b5e9" width="66%">
+In a typical VEX drivetrain, the motors are mounted within or alongside the chassis rails. Our design required significantly more motors to be positioned around the same area, while also leaving room for the gear trains that controlled the power distribution.
 
-The final four-bar mechanism is controlled by **two pneumatic pistons**.
+As a result, we moved the drivetrain motors **above the chassis rails** and arranged them next to each other.
 
-The pistons push an **over-center linkage**.
+![Raised drivetrain motors](https://github.com/user-attachments/assets/f261bbe0-8719-4142-97cf-cd39a332b317)
 
-Once the linkage passes its center point, it mechanically locks into position. This means the mechanism does not need continuous pneumatic force to remain raised.
+*Unlike a conventional VEX drivetrain, where motors are commonly mounted within the chassis rails, this design required the drivetrain motors to be raised above the chassis and positioned next to one another.*
 
-<img src="https://github.com/user-attachments/assets/90e80fd0-cf7d-49cc-8f6e-e787f0387127" width="66%">
-
-This reduced the amount of pneumatic force required to hold the mechanism in position and made the system more mechanically stable.
+This unconventional motor arrangement gave us the physical space needed to implement the additional gearing and power-transfer mechanisms.
 
 ---
 
-## 11. Chassis Architecture
+# 9. Intake and Wing Design
 
-Unlike a typical VEX drivetrain, where the motors are usually mounted inside the chassis rails, this design required the motors to be mounted **above the chassis**.
+The changes to our game strategy also influenced the design of the intake and wing.
 
-The motors were placed next to each other to make the power distribution system physically possible.
+We established several requirements:
 
-<img src="https://github.com/user-attachments/assets/f261bbe0-8719-4142-97cf-cd39a332b317" width="66%">
+1. The robot needed a **vertical wing**.
+2. The wing needed to be compact enough to allow the robot to **drive underneath the Long Goal**.
+3. The wing needed to maintain its orientation throughout its movement.
+4. The intake needed to reliably collect and transfer balls.
+5. The intake needed to integrate with the motor-sharing and flywheel systems.
 
-This unconventional motor placement was necessary because the drivetrain, transmission, and pneumatic clutches all needed to occupy the same region of the robot.
+## Parallel Four-Bar Wing
 
-The chassis was therefore designed around the mechanical power-sharing system rather than treating the drivetrain as an isolated component.
+To satisfy these requirements, we designed the wing around a **parallel four-bar linkage**.
 
----
+A parallel four-bar linkage maintains the orientation of the component mounted to it as the mechanism moves.
 
-## 12. Intake Development
+In our design, this means that the wing remains at the same angle relative to the floor throughout its entire range of motion.
 
-The intake was developed in multiple stages.
+![Intake four-bar development](https://github.com/user-attachments/assets/951a2255-c919-407d-8664-7df89594b5e9)
 
-The first stage uses a small arm to manipulate game elements and guide them into the rest of the intake.
+*Early development of the four-bar system.*
 
-<img src="https://github.com/user-attachments/assets/3516ad72-3f51-4269-8f1f-f887541e04b5" width="66%">
+This was important because we wanted the wing to remain vertical while deploying and retracting.
 
-The complete intake frame can be seen below.
+A vertical wing also provided two advantages for our specific design:
 
-<img src="https://github.com/user-attachments/assets/55170800-4c27-43e2-9e45-18f21c5f980f" width="66%">
+- It required a smaller range of movement.
+- Its geometry made it easier to position the wing into the Long Goal.
 
-<img src="https://github.com/user-attachments/assets/cd7d7d56-4bcf-4ad4-a26b-40be98e935f1" width="66%">
-
-The intake was designed as multiple stages so that game elements could be moved from the floor, through the robot, and toward the scoring mechanism.
-
----
-
-## 13. Intake Assembly
-
-The first two intake stages were mounted onto the robot before the rest of the mechanisms were completed.
-
-<img src="https://github.com/user-attachments/assets/264850cc-c773-412e-949b-691faf843fd5" width="66%">
-
-<img src="https://github.com/user-attachments/assets/5096daa0-a9e7-4aad-9409-381ec9920b1f" width="66%">
-
-<img src="https://github.com/user-attachments/assets/8de26fd9-d26b-41e4-9a94-668a9b9d36c5" width="66%">
-
-These views show the intake in both the closed and raised positions.
+The four-bar therefore allowed us to combine a compact mechanism with predictable movement.
 
 ---
 
-## 14. Ball Storage System
+## 10. Intake Development
 
-The front of the robot contains a **large basket** used to store balls as a reserve.
+The first and second stages of the intake retained much of the architecture from our previous robot because that system had already proven effective at collecting and transferring balls.
 
-Instead of immediately feeding every ball through the scoring mechanism, the robot can collect balls into the basket and store them until they are needed.
+The new design focused on integrating these stages with the flywheel, storage system, and motor-sharing mechanism.
 
-This provides several advantages:
+![Intake arm](https://github.com/user-attachments/assets/3516ad72-3f51-4269-8f1f-f887541e04b5)
 
-- Balls can be collected quickly.
-- The robot can build up a reserve of scoring objects.
-- Balls can be scored later when the robot is in a better position.
-- The robot does not need to stop collecting every time it wants to score.
+*Small intake arm used to manipulate game elements.*
 
-The balls are fed **upward from the bottom** of the robot.
+![Full intake frame](https://github.com/user-attachments/assets/55170800-4c27-43e2-9e45-18f21c5f980f)
 
-This was different from V1, where the balls entered from the top and were essentially tossed into the system.
+*Full intake frame during development.*
+
+![Intake frame](https://github.com/user-attachments/assets/cd7d7d56-4bcf-4ad4-a26b-40be98e935f1)
+
+*Additional view of the intake frame.*
+
+![First two intake stages](https://github.com/user-attachments/assets/264850cc-c773-412e-949b-691faf843fd5)
+
+![First two intake stages raised](https://github.com/user-attachments/assets/5096daa0-a9e7-4aad-9409-381ec9920b1f)
+
+![Intake stages and four-bar](https://github.com/user-attachments/assets/8de26fd9-d26b-41e4-9a94-668a9b9d36c5)
+
+*The first two intake stages mounted to the robot. The images show the four-bar in both its retracted and raised positions.*
 
 ---
 
-## 15. Defensive Mode
+# 11. Ball Storage System
 
-One of the advantages of the power distribution system is that the robot can switch away from its scoring configuration and prioritize drivetrain power.
+The largest change to the intake was the **ball storage system**.
 
-In defensive mode, the drivetrain can use the **200 RPM high-torque configuration**.
+Our new robot uses a large basket at the front of the robot to store balls. We designed this area as a reserve so that we could collect balls earlier in the match and save them for later scoring opportunities.
 
-This sacrifices speed for pushing power.
+This allowed us to treat stored balls as a resource that could be accessed when needed rather than requiring us to immediately score every ball we collected.
 
-With more drivetrain motors available and the lower-speed gear ratio engaged, the robot is much better suited for pushing and holding position against another robot.
+Unlike our previous robot, where balls entered the storage system from the top and were tossed into the storage area, the new robot feeds balls **upward from the bottom**.
 
-### Defensive Driving Test
+This made the storage system more compatible with the new intake geometry and allowed us to create a larger, more controlled storage area.
+
+---
+
+# 12. Weight Reduction and Custom Parts
+
+Because we wanted the robot to be as fast as possible, we looked for opportunities to reduce unnecessary weight.
+
+One of the simplest areas for weight reduction was the large number of shaft collars used throughout the robot.
+
+Instead of using standard VEX shaft collars everywhere, we designed and manufactured **custom 3D-printed plastic shaft collars**.
+
+![VEX shaft collar comparison](https://github.com/user-attachments/assets/20fefcde-33f0-46e6-af50-c1f2a22f3413)
+
+*Comparison between a standard VEX shaft collar on the left and our custom 3D-printed plastic version on the right.*
+
+![Shaft collar manufacturing jig](https://github.com/user-attachments/assets/8c86951e-ea83-42f1-b918-ac675b2c2f75)
+
+*3D-printed manufacturing jig used to consistently produce the custom plastic shaft collars.*
+
+The custom collars reduced weight while still performing the same basic function as the standard components.
+
+This was an example of a broader design philosophy we followed throughout the robot:
+
+> **Remove weight wherever it does not contribute to performance, then use that saved weight where it matters.**
+
+---
+
+# 13. Complete Robot Assembly
+
+After developing the individual systems, we integrated the drivetrain, transmission, clutches, intake, four-bar, flywheel, and storage system into a single robot.
+
+![Robot with intake stages](https://github.com/user-attachments/assets/264850cc-c773-412e-949b-691faf843fd5)
+
+*Robot during integration of the first two intake stages.*
+
+![Robot with raised four-bar](https://github.com/user-attachments/assets/5096daa0-a9e7-4aad-9409-381ec9920b1f)
+
+*Robot with the four-bar mechanism raised.*
+
+![Full robot assembly](https://github.com/user-attachments/assets/8de26fd9-d26b-41e4-9a94-668a9b9d36c5)
+
+*Full robot assembly during development.*
+
+---
+
+# 14. Testing
+
+A major goal of the design was to ensure that the different mechanical configurations were useful in an actual match rather than simply working in isolation.
+
+One of our primary tests was the robot's **defensive configuration**, where six motors power the drivetrain and the transmission shifts into the 200 RPM high-torque ratio.
 
 [![Robot driving in defensive mode](https://img.youtube.com/vi/C5uM0KIjCk0/maxresdefault.jpg)](https://youtube.com/shorts/C5uM0KIjCk0?feature=share)
 
----
+*Video of the robot driving in its defensive configuration.*
 
-## 16. Weight Reduction and Custom Parts
-
-Because the robot contained a large amount of mechanical hardware, weight became an important design constraint.
-
-One of the small but useful changes I made was replacing the standard VEX shaft collars with custom-made plastic shaft collars.
-
-<img src="https://github.com/user-attachments/assets/20fefcde-33f0-46e6-af50-c1f2a22f3413" width="66%">
-
-The custom collars were significantly lighter than the standard metal components.
-
-To manufacture them consistently, I also designed a **3D-printed jig**.
-
-<img src="https://github.com/user-attachments/assets/8c86951e-ea83-42f1-b918-ac675b2c2f75" width="33%">
-
-The jig made it possible to produce multiple plastic shaft collars with consistent dimensions.
-
-This was a small change, but it demonstrated an important part of my design philosophy: reducing weight wherever possible without sacrificing the function of the robot.
+This configuration demonstrated the intended tradeoff between speed and pushing power. The robot is slower than its 600 RPM configuration, but the increased gear reduction allows the drivetrain to generate substantially more torque.
 
 ---
 
-## 17. Complete Robot Assembly
+# 15. Previous Robot: V1 Development
 
-The final robot combines several systems into one compact mechanical package:
+The final robot was heavily influenced by what we learned from our first robot of the season.
 
-- Eight total motors
-- Two pneumatic power-distribution clutches
-- Two-speed drivetrain transmission
-- Multiple gear trains
-- Chain-driven power transfer
-- Multi-stage intake
-- Vertical four-bar wing
-- Flywheel scoring system
-- Large front ball storage basket
-- Custom lightweight components
+Before developing the V2 architecture, we explored several complicated mechanisms on V1. These prototypes helped us identify which concepts were worth carrying forward and which needed to be redesigned.
 
-The main challenge was not designing each mechanism individually.
+### Early V1 Concepts
 
-It was getting **all of the mechanisms to work together without interfering with each other**.
+![Early V1 sketch](https://github.com/user-attachments/assets/54f4748f-9ace-4621-84a7-013075337325)
 
-The drivetrain had to share motors with the intake and flywheel.
+![Early V1 sketch](https://github.com/user-attachments/assets/7c582b40-9d73-449b-b7de-50eedddcd214)
 
-The transmission had to change ratios while also responding to the pneumatic clutch system.
+*Early sketches from the V1 robot.*
 
-The wing had to remain compact enough to drive underneath the Long Goal.
+![V1 back view](https://github.com/user-attachments/assets/ac7e817c-5c12-4226-b961-18bd81ed634f)
 
-The intake had to fit around the drivetrain and scoring mechanisms.
-
-This required designing the robot as one interconnected mechanical system rather than as a collection of independent mechanisms.
+*Back view of the V1 robot.*
 
 ---
 
-# Previous Robot — V1 Development
+## 16. V1 Ball Routing System
 
-Before designing V2, I developed another robot during the same season.
+One of the more complicated mechanisms on V1 was the ball-routing system.
 
-V1 was an important part of the design process because many of the ideas used in V2 came from problems I encountered while building and competing with it.
+We designed a mechanical "hood" that used **three separate pneumatic actuators** to determine the path a ball would take through the robot.
 
----
+By changing the positions of these mechanisms, the robot could create **four different ball paths**.
 
-## 18. Early V1 Design Concepts
+![V1 hood mechanism](https://github.com/user-attachments/assets/e860afbd-da1b-4683-bd47-85d5f88176ef)
 
-These are some of the early sketches from V1.
+![V1 hood mechanism](https://github.com/user-attachments/assets/215d4b5e-5108-4932-8ff4-c75e0347bb4b)
 
-<img src="https://github.com/user-attachments/assets/54f4748f-9ace-4621-84a7-013075337325" width="66%">
+![V1 hood mechanism](https://github.com/user-attachments/assets/33f03e8f-628c-44df-b108-cfb477bb0f14)
 
-<img src="https://github.com/user-attachments/assets/7c582b40-9d73-449b-b7de-50eedddcd214" width="66%">
+*The V1 hood used three separate pneumatic actuators to control which of four possible paths a ball would take through the robot.*
 
-The sketches show the early development of the chassis, intake, hood, and game-element mechanisms.
+We also developed an expandable ramp because the distance a ball needed to travel changed depending on the position of the hood.
 
----
+![V1 expandable ramp](https://github.com/user-attachments/assets/728b82bf-0c6b-48d7-979e-d001482723f3)
 
-## 19. V1 Ball Routing System
+*Expandable ramp designed to accommodate the different distances a ball needed to travel depending on the hood position.*
 
-One of the most complicated parts of V1 was its hood.
+[![V1 intake and hood](https://img.youtube.com/vi/9tBNqNpJNY4/maxresdefault.jpg)](https://youtube.com/shorts/9tBNqNpJNY4?feature=share)
 
-The hood used **three separate pneumatic pistons** to determine where a ball would go.
-
-This created **four different possible ball paths**.
-
-<img src="https://github.com/user-attachments/assets/e860afbd-da1b-4683-bd47-85d5f88176ef" width="66%">
-
-<img src="https://github.com/user-attachments/assets/215d4b5e-5108-4932-8ff4-c75e0347bb4b" width="66%">
-
-<img src="https://github.com/user-attachments/assets/33f03e8f-628c-44df-b108-cfb477bb0f14" width="66%">
-
-This allowed the robot to control the destination of each ball mechanically.
-
-However, the system was significantly more complicated than what I eventually wanted for V2.
-
-The experience taught me that adding more mechanical options is not always the best solution. A mechanism should provide enough flexibility to solve the strategic problem without introducing unnecessary complexity.
+*Video of the V1 intake and hood system.*
 
 ---
 
-## 20. V1 Expandable Ramp
+# 17. Design Iteration and Engineering Lessons
 
-V1 also used an expandable ramp for game elements.
+The V2 robot was not simply a more refined version of V1. The biggest improvement was in how we approached the design process.
 
-The amount of distance a game element traveled depended on whether the hood was raised or lowered.
+Our strategy changed first.
 
-<img src="https://github.com/user-attachments/assets/728b82bf-0c6b-48d7-979e-d001482723f3" width="66%">
+That strategic change created a need for a flywheel.
 
-The ramp allowed the robot to adapt the path of the game element depending on the configuration of the hood.
+The flywheel created a need for additional motor power.
 
----
+The additional motor power created a drivetrain torque problem.
 
-## 21. V1 Robot
+The torque problem led to the development of a two-speed transmission.
 
-The back view of the completed V1 robot can be seen below.
+The limited motor count led to the development of mechanical power-sharing clutches.
 
-<img src="https://github.com/user-attachments/assets/ac7e817c-5c12-4226-b961-18bd81ed634f" width="66%">
+The new mechanisms created packaging challenges that forced us to rethink the chassis, motor placement, intake, and power transmission.
 
-The V1 design provided the foundation for many of the ideas that eventually became part of V2.
+The resulting design can therefore be represented as a chain of engineering decisions:
 
----
 
-## 22. V1 Intake With Hood
-
-A demonstration of the V1 intake and hood mechanism:
-
-[![V1 intake with hood](https://img.youtube.com/vi/9tBNqNpJNY4/maxresdefault.jpg)](https://youtube.com/shorts/9tBNqNpJNY4?feature)
-
----
-
-# 23. Design Iteration and Engineering Lessons
-
-The development of these robots taught me that successful robotics design is not simply about building the most complicated mechanism possible.
-
-The most important part is identifying the actual problem and designing the mechanism around it.
-
-V1 showed me the limitations of relying heavily on winging.
-
-As the competitive meta changed, the wing became less effective because fewer balls were available in the control zone.
-
-That led to the flywheel strategy used in V2, where the robot could disrupt the opponent's control from a distance.
-
-The motor-sharing gearbox came from a similar thought process.
-
-Rather than accepting that the robot needed separate motors for every task, I looked for a way to **change the allocation of power mechanically**.
-
-This eventually led to the pneumatic clutch system, two-speed transmission, chain drives, and gear trains working together as one system.
-
-The final robot is the result of several iterations of:
-
-> **Identify the problem → design a mechanism → test it → find its limitations → redesign it.**
-
-That process is what I find most valuable about robotics. The final robot is not just a collection of mechanisms; it is the result of continuously adapting the design to solve increasingly specific problems.
-```
+Changing Push Back strategy
+            ↓
+Need to directly disrupt the Goal Control Zone
+            ↓
+High-powered flywheel
+            ↓
+Increased motor requirements
+            ↓
+Dynamic motor power sharing
+            ↓
+Fewer motors available to drivetrain
+            ↓
+Insufficient drivetrain torque
+            ↓
+Two-speed transmission
+            ↓
+600 RPM high-speed ratio
+            +
+200 RPM high-torque ratio
+            ↓
+Adaptive drivetrain performance
